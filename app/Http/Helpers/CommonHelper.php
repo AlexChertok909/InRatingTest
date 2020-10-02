@@ -7,7 +7,7 @@ use App\User, App\Post, App\Comment, App\Image;
 
 class CommonHelper
 {
-    public function getActiveUsers()
+    public function getActiveUsers(): Collection
     {
         $users = User::where('active', true)->get(['id', 'name']);
 
@@ -27,7 +27,13 @@ class CommonHelper
             ->get();
 
         return $users->map(function ($user) use($posts) {
-            $userPosts = $posts->where('author_id', $user->id)->all();
+            $userPosts = $posts->where('author_id', $user->id);
+
+            // 6.1
+            if(!empty(request('posts_limit')))
+                $userPosts = $userPosts->take(request('posts_limit'));
+
+            $userPosts = $userPosts->all();
 
             foreach ($userPosts as &$userPost)
                 unset($userPost->author_id);
