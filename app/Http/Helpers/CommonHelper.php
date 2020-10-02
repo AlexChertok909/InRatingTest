@@ -26,11 +26,11 @@ class CommonHelper
             ->whereIn('posts.author_id', $userIds)
             ->get();
 
-        return $users->map(function ($user) use($posts) {
+        return $users->map(function ($user) use ($posts) {
             $userPosts = $posts->where('author_id', $user->id);
 
             // 6.1
-            if(!empty(request('posts_limit')))
+            if (!empty(request('posts_limit')))
                 $userPosts = $userPosts->take(request('posts_limit'));
 
             $userPosts = $userPosts->all();
@@ -45,5 +45,10 @@ class CommonHelper
 
             return $user;
         });
+    }
+
+    public function getUserComments($userId)
+    {
+        return ['id' => $userId];
     }
 }

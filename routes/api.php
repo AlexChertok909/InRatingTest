@@ -19,3 +19,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('/getActiveUsers', 'CommonController@getActiveUsers');
+Route::post('/getUserComments', 'CommonController@getUserComments');
