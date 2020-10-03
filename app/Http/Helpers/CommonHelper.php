@@ -4,7 +4,7 @@ namespace App\Http\Helpers;
 
 use Illuminate\Database\Eloquent\Collection;
 use App\Repositories\CommonRepository;
-use App\User, App\Post, App\Comment, App\Image;
+use App\User, App\Comment;
 
 /**
  * Class CommonHelper
@@ -92,14 +92,19 @@ class CommonHelper
 
     /**
      * @param Collection $comments
-     * @return Collection|\Illuminate\Support\Collection
+     * @return Collection
      */
-    private function addImage(Collection $comments)
+    private function addImage(Collection $comments): Collection
     {
         return $comments->map(function ($comment) {
 
             $comment->post->image = $comment->post->load('image')
                 ->get();
+
+            // 7.2.1
+            $comment->post->author = User::where('id', $comment->post->author_id)
+                ->where('active', true)
+                ->first();
 
             return $comment;
         });
