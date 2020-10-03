@@ -27,10 +27,19 @@ class CommentSeeder extends Seeder
             }
         });
 
-        $random = $posts->random(21);
+		$comments = Comment::get();
+        $randomComments = $comments->random(21);
 
-        $random->each(function ($post) {
-            $post->delete();
+        $randomComments->each(function ($comment) {
+            $comment->delete();
+        });
+
+
+        $randomPosts= $posts->random(21);
+
+        $randomPosts->each(function ($post) {
+            $post->image_id = null;
+			$post->save();
         });
 
     }

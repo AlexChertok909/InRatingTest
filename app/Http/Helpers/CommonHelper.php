@@ -3,10 +3,25 @@
 namespace App\Http\Helpers;
 
 use Illuminate\Database\Eloquent\Collection;
+use App\Repositories\CommonRepository;
 use App\User, App\Post, App\Comment, App\Image;
 
+/**
+ * Class CommonHelper
+ * @package App\Http\Helpers
+ */
 class CommonHelper
 {
+    protected $commonRepository;
+
+    public function __construct(CommonRepository $commonRepository)
+    {
+        $this->commonRepository = $commonRepository;
+    }
+
+    /**
+     * @return Collection
+     */
     public function getActiveUsers(): Collection
     {
         $users = User::where('active', true)->get(['id', 'name']);
@@ -16,18 +31,16 @@ class CommonHelper
 
         $userIds = $users->pluck('id')->all();
 
-        $posts = Post::leftJoin('images as i', 'i.id', '=', 'posts.image_id')
-            ->select(
-                'posts.id',
-                'posts.content',
-                'i.url as image_url',
-                'posts.author_id'
-            )
-            ->whereIn('posts.author_id', $userIds)
-            ->get();
+        $posts = $this->commonRepository->getPostsByUserIds($userIds);
+
+        // 6.2
+        $posts = $this->addComments($posts);
 
         return $users->map(function ($user) use ($posts) {
             $userPosts = $posts->where('author_id', $user->id);
+
+            // 6.3
+            $userPosts = $userPosts->sortBy('countOfComments');
 
             // 6.1
             if (!empty(request('posts_limit')))
@@ -42,13 +55,26 @@ class CommonHelper
 
             $user->posts = $userPosts;
 
-
             return $user;
         });
     }
 
-    public function getUserComments($userId)
+    public function getUserComments(int $userId)
     {
         return ['id' => $userId];
+    }
+
+    /**
+     * @param Collection $posts
+     * @return Collection
+     */
+    private function addComments(Collection $posts): Collection
+    {
+        $comments = Comment::get();
+
+        return $posts->map(function ($post) use ($comments) {
+            $post->countOfComments = $comments->where('post_id', $post->id)->count();
+            return $post;
+        });
     }
 }

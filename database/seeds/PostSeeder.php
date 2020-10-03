@@ -12,7 +12,7 @@ class PostSeeder extends Seeder
      */
     public function run()
     {
-        $userIds = User::where('active', true)->get('id');
+        $userIds = User::get('id');
 
         $userIds->each(function ($userId) {
 
