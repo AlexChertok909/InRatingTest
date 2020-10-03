@@ -10,6 +10,10 @@ use App\User, App\Post, App\Comment, App\Image;
 
 class CommonRepository
 {
+    /**
+     * @param array $userIds
+     * @return Collection
+     */
     public function getPostsByUserIds(array $userIds): Collection
     {
         return Post::leftJoin('images as i', 'i.id', '=', 'posts.image_id')
@@ -20,6 +24,51 @@ class CommonRepository
                 'posts.author_id'
             )
             ->whereIn('posts.author_id', $userIds)
+            ->get();
+    }
+
+    /**
+     * @param int $userId
+     * @return array
+     */
+    public function getCommentsByUserIdSQL(int $userId): array
+    {
+        return DB::select(DB::raw("SELECT comments.* FROM comments
+            LEFT JOIN posts ON comments.post_id = posts.id
+            WHERE posts.image_id IS NOT NULL AND comments.commentator_id = :userId
+            ORDER BY comments.created_at DESC"), array(
+            'userId' => $userId,
+        ));
+    }
+
+    /**
+     * @param int $userId
+     * @return Collection
+     */
+    public function getCommentsByUserId(int $userId): Collection
+    {
+        return Comment::withTrashed()
+            ->leftJoin('posts as p', 'p.id', '=', 'comments.post_id')
+            ->select('comments.*')
+            ->where('comments.commentator_id', $userId)
+            ->whereNotNull('p.image_id')
+            ->orderBy('comments.created_at', 'desc')
+            ->get();
+    }
+
+    /**
+     * @param int $userId
+     * @return Collection
+     */
+    public function getCommentsByUserIdLoad(int $userId)
+    {
+        return Comment::with('post')
+            ->withTrashed()
+            ->leftJoin('posts as p', 'p.id', '=', 'comments.post_id')
+            ->select('comments.*')
+            ->where('comments.commentator_id', $userId)
+            ->whereNotNull('p.image_id')
+            ->orderBy('comments.created_at', 'desc')
             ->get();
     }
 }

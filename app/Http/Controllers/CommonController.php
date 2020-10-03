@@ -17,25 +17,25 @@ class CommonController extends Controller
     }
 
     /**
-     *  @return JsonResponse
+     * @return JsonResponse
      */
     public function getActiveUsers(): JsonResponse
     {
-        return response()->json( $this->commonHelper->getActiveUsers());
+        return response()->json($this->commonHelper->getActiveUsers());
     }
 
     /**
-     *  @return JsonResponse
+     * @return JsonResponse
      */
     public function getUserComments(): JsonResponse
     {
         $checkValidator = Validator::make(request()->toArray(), [
             'user_id' => 'required|integer|digits_between:1,11|min:1',
-        ]);		;
+        ]);;
 
         if ($checkValidator->fails())
             return response()->json(['error' => implode(" ", $checkValidator->errors()->all())], 400);
 
-        return response()->json( $this->commonHelper->getUserComments(request('user_id')));
+        return response()->json($this->commonHelper->getUserComments(request('user_id')));
     }
 }

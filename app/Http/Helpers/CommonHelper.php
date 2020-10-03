@@ -59,9 +59,21 @@ class CommonHelper
         });
     }
 
+    /**
+     * @param int $userId
+     * @return Collection|\Illuminate\Support\Collection
+     */
     public function getUserComments(int $userId)
     {
-        return ['id' => $userId];
+        // 7.1
+        $commentsSql = $this->commonRepository->getCommentsByUserIdSQL($userId);
+        $comments = $this->commonRepository->getCommentsByUserId($userId);
+
+        // 7.2
+        $comments = $this->commonRepository->getCommentsByUserIdLoad($userId);
+        $comments = $this->addImage($comments);
+
+        return $comments;
     }
 
     /**
@@ -75,6 +87,21 @@ class CommonHelper
         return $posts->map(function ($post) use ($comments) {
             $post->countOfComments = $comments->where('post_id', $post->id)->count();
             return $post;
+        });
+    }
+
+    /**
+     * @param Collection $comments
+     * @return Collection|\Illuminate\Support\Collection
+     */
+    private function addImage(Collection $comments)
+    {
+        return $comments->map(function ($comment) {
+
+            $comment->post->image = $comment->post->load('image')
+                ->get();
+
+            return $comment;
         });
     }
 }
