@@ -52,4 +52,12 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Comment');
     }
+
+    /**
+     * The companies that belong to the user.
+     */
+    public function companies()
+    {
+        return $this->belongsToMany('App\Company', 'company_user')->withPivot('created_at');
+    }
 }

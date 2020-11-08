@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use App\User, App\Post, App\Comment, App\Image;
+use App\CompanyUser, App\Company, App\Country;
 
 class CommonRepository
 {
@@ -70,5 +71,12 @@ class CommonRepository
             ->whereNotNull('p.image_id')
             ->orderBy('comments.created_at', 'desc')
             ->get();
+    }
+
+    public function getUserByCountry($country)
+    {
+        return Country::with('companies.users.companies')
+            ->where('name', $country)
+            ->first();
     }
 }

@@ -12,7 +12,7 @@ class ImageSeeder extends Seeder
      */
     public function run()
     {
-        for ($i = 1; $i <= 100; $i++) {
+        for ($i = 1; $i <= 1000; $i++) {
             Image::create([
                 'url' => 'https://InRatingTest/cdn/pulic/image_' . $i . '.png',
             ]);

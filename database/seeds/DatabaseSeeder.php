@@ -16,7 +16,11 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ImageSeeder::class,
             PostSeeder::class,
-            CommentSeeder::class
+            CommentSeeder::class,
+            CountrySeeder::class,
+            CompanySeeder::class,
+            CompanyUserSeeder::class
+
 
         ]);
     }

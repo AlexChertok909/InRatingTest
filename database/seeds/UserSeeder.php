@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
     {
         $active = true;
 
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 100; $i++) {
             if (in_array($i, [5, 7]))
                 $active = false;
 

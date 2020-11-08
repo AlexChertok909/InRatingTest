@@ -2,6 +2,8 @@
 
 namespace App\Http\Helpers;
 
+use App\Company;
+use App\Country;
 use Illuminate\Database\Eloquent\Collection;
 use App\Repositories\CommonRepository;
 use App\User, App\Comment;
@@ -74,6 +76,37 @@ class CommonHelper
         $comments = $this->addImage($comments);
 
         return $comments;
+    }
+
+    public function getUserByCountry($country)
+    {
+        // вариант 1
+        // $countryModel = $this->commonRepository->getUserByCountry($country);
+        // return $countryModel->companies->pluck('users')->all();
+
+
+        // вариант 2
+        $countryModel = Country::where('name', $country)->first();
+        $companies = $countryModel->load('companies')->companies;
+
+        if($companies->isEmpty())
+           return $companies;
+
+        $result = collect([]);
+
+        $companies->each(function ($company) use (&$result) {
+            $company->load('users')->users->each(function ($user) use (&$result) {
+                $row = ['user_id' => $user->id, 'user_name' => $user->name, 'company_name' => null, 'date' => null];
+                $user->load('companies')->companies->each(function ($userCompany) use (&$row) {
+                    $row['company_name'] = $userCompany->name;
+                    $row['date'] = $userCompany->pivot->created_at;
+                });
+                $result->push(collect($row));
+            });
+
+        });
+
+        return $result->unique();
     }
 
     /**

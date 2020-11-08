@@ -38,4 +38,21 @@ class CommonController extends Controller
 
         return response()->json($this->commonHelper->getUserComments(request('user_id')));
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function getUserByCountry(): JsonResponse
+    {
+        $checkValidator = Validator::make(request()->toArray(), [
+            'country' => 'required|string',
+        ]);;
+
+        if ($checkValidator->fails())
+            return response()->json(['error' => implode(" ", $checkValidator->errors()->all())], 400);
+
+        return response()->json($this->commonHelper->getUserByCountry(request('country')));
+    }
+
+
 }
